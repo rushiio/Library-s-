@@ -4,6 +4,8 @@
   "private": true,
   "description": "LibraAI - Advanced AI-powered Library Management System",
   "scripts": {
+    "build": "cd client && npm install && npm run build && cd ../server && npm install && npx prisma generate",
+    "vercel-build": "cd client && npm install && npm run build && cd ../server && npm install && npx prisma generate",
     "server:install": "cd server && npm install",
     "client:install": "cd client && npm install",
     "install:all": "npm install && cd server && npm install && cd ../client && npm install",

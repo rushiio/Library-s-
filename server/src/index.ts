@@ -128,10 +128,12 @@ const initAdminAccount = async () => {
   }
 };
 
-app.listen(PORT, async () => {
-  console.log(`🚀 LibraAI Server running on port ${PORT}`);
-  console.log(`📡 AI Service Configured: ${AIService.isConfigured() ? 'YES (OpenRouter)' : 'OFFLINE (Fallback Mode)'}`);
-  await initAdminAccount();
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, async () => {
+    console.log(`🚀 LibraAI Server running on port ${PORT}`);
+    console.log(`📡 AI Service Configured: ${AIService.isConfigured() ? 'YES (Active)' : 'OFFLINE (Fallback Mode)'}`);
+    await initAdminAccount();
+  });
+}
 
 export default app;
