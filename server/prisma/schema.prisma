@@ -1,0 +1,236 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                   String         @id @default(uuid())
+  memberId             String         @unique // e.g., "ADM001", "LIB001", "FAC001", "STU001"
+  name                 String
+  email                String         @unique
+  passwordHash         String
+  role                 String         @default("STUDENT") // STUDENT, FACULTY, LIBRARIAN, ADMIN
+  department           String?        // e.g., "Computer Engineering"
+  semester             Int?           // 1 to 8
+  year                 Int?           // 1 to 4
+  enrollmentNumber     String?        // Student roll/enrollment number
+  phone                String?
+  avatarUrl            String?
+  readingStreak        Int            @default(0)
+  totalPoints          Int            @default(0)
+  badges               String?        // JSON array
+  status               String         @default("ACTIVE") // ACTIVE, PENDING_APPROVAL, INACTIVE, REJECTED
+  isActive             Boolean        @default(true)
+  isEmailVerified      Boolean        @default(true)
+  mustChangePassword   Boolean        @default(false)
+  verificationToken    String?
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+  lastLoginAt          DateTime?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  issues        IssueRecord[]
+  reservations  Reservation[]
+  fines         Fine[]
+  reviews       BookReview[]
+  seatBookings  SeatBooking[]
+  activityLogs  ActivityLog[]
+  readingList   FacultyList[]
+}
+
+model Book {
+  id              String         @id @default(uuid())
+  title           String
+  author          String
+  isbn            String?
+  publisher       String?
+  edition         String?
+  year            Int?
+  department      String         // Normalized Department/Category
+  resourceType    String         @default("Text Book")
+  language        String         @default("English")
+  description     String?
+  coverUrl        String?
+  pdfUrl          String?        // For e-resources & Ask-the-Book
+  difficultyLevel String         @default("Beginner") // Beginner, Intermediate, Advanced
+  tags            String?        // JSON array of keywords
+  embedding       String?        // Vector embedding JSON for semantic search
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  copies          BookCopy[]
+  reservations    Reservation[]
+  reviews         BookReview[]
+  facultyListItems FacultyListItem[]
+
+  @@index([title, author])
+  @@index([department])
+  @@index([isbn])
+}
+
+model BookCopy {
+  id              String         @id @default(uuid())
+  bookId          String
+  accessionSeries String         @default("D")
+  accessionNumber String         // e.g., "1", "501"
+  barcode         String         @unique // e.g., "D-1", "D-501"
+  rfid            String?
+  location        String         @default("Diploma Library") // Shelf / Rack / Section
+  shelfNumber     String?        // e.g., "Rack C-04, Shelf 2"
+  condition       String         @default("Good")
+  status          String         @default("AVAILABLE") // AVAILABLE, ISSUED, RESERVED, LOST, DAMAGED, IN_MAINTENANCE
+  price           Float          @default(0.0)
+  invoiceNo       String?
+  callNumber      String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  book            Book           @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  issues          IssueRecord[]
+
+  @@unique([accessionSeries, accessionNumber])
+  @@index([barcode])
+  @@index([status])
+}
+
+model IssueRecord {
+  id             String         @id @default(uuid())
+  bookCopyId     String
+  userId         String
+  issuedDate     DateTime       @default(now())
+  dueDate        DateTime
+  returnedDate   DateTime?
+  renewCount     Int            @default(0)
+  status         String         @default("ACTIVE") // ACTIVE, RETURNED, OVERDUE, LOST
+  issuedBy       String?        // Staff member ID
+  returnedTo     String?
+  remarks        String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  copy           BookCopy       @relation(fields: [bookCopyId], references: [id])
+  user           User           @relation(fields: [userId], references: [id])
+  fines          Fine[]
+
+  @@index([userId, status])
+  @@index([dueDate])
+}
+
+model Reservation {
+  id             String            @id @default(uuid())
+  bookId         String
+  userId         String
+  reservedDate   DateTime          @default(now())
+  expiryDate     DateTime?
+  queuePosition  Int               @default(1)
+  priorityScore  Float             @default(1.0) // Exam-aware priority
+  status         String            @default("PENDING") // PENDING, FULFILLED, CANCELLED, EXPIRED
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  book           Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([bookId, status])
+}
+
+model Fine {
+  id             String         @id @default(uuid())
+  issueRecordId  String
+  userId         String
+  amount         Float
+  daysOverdue    Int
+  status         String         @default("UNPAID") // UNPAID, PAID, WAIVED
+  paidDate       DateTime?
+  waivedBy       String?        // Librarian user ID
+  waiverReason   String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  issueRecord    IssueRecord    @relation(fields: [issueRecordId], references: [id])
+  user           User           @relation(fields: [userId], references: [id])
+
+  @@index([userId, status])
+}
+
+model BookReview {
+  id             String         @id @default(uuid())
+  bookId         String
+  userId         String
+  rating         Int            // 1 to 5
+  comment        String?
+  sentiment      String?        // positive, neutral, negative
+  createdAt      DateTime       @default(now())
+
+  book           Book           @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SeatBooking {
+  id             String         @id @default(uuid())
+  userId         String
+  seatCode       String         // e.g., "ZONE-A-S12"
+  roomType       String         // "Silent Study", "Group Discussion", "Digital Lab"
+  startTime      DateTime
+  endTime        DateTime
+  status         String         @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED
+  createdAt      DateTime       @default(now())
+
+  user           User           @relation(fields: [userId], references: [id])
+
+  @@index([seatCode, startTime, endTime])
+}
+
+model FacultyList {
+  id             String         @id @default(uuid())
+  facultyId      String
+  subjectCode    String         // e.g., "CS-302"
+  subjectName    String         // e.g., "Operating Systems"
+  semester       Int
+  createdAt      DateTime       @default(now())
+
+  faculty        User           @relation(fields: [facultyId], references: [id])
+  items          FacultyListItem[]
+}
+
+model FacultyListItem {
+  id             String         @id @default(uuid())
+  listId         String
+  bookId         String
+  isMandatory    Boolean        @default(true)
+  notes          String?
+
+  list           FacultyList    @relation(fields: [listId], references: [id], onDelete: Cascade)
+  book           Book           @relation(fields: [bookId], references: [id], onDelete: Cascade)
+}
+
+model ActivityLog {
+  id             String         @id @default(uuid())
+  userId         String?
+  action         String         // e.g., "BOOK_ISSUE", "EXCEL_IMPORT", "FINE_WAIVE"
+  details        String         // JSON string
+  ipAddress      String?
+  previousHash   String?        // Cryptographic Hash Chaining
+  currentHash    String         // SHA-256
+  createdAt      DateTime       @default(now())
+
+  user           User?          @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+}
+
+model AICache {
+  id             String         @id @default(uuid())
+  cacheKey       String         @unique // SHA-256 hash of prompt/query
+  promptType     String         // "search", "chatbot", "summary", "roadmap"
+  response       String         // Cached JSON string
+  expiresAt      DateTime
+  createdAt      DateTime       @default(now())
+
+  @@index([cacheKey])
+}

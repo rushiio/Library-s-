@@ -1,0 +1,19 @@
+{
+  "name": "libra-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LibraAI - Advanced AI-powered Library Management System",
+  "scripts": {
+    "server:install": "cd server && npm install",
+    "client:install": "cd client && npm install",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd client && npm run dev",
+    "prisma:generate": "cd server && npx prisma generate",
+    "prisma:push": "cd server && npx prisma db push",
+    "prisma:seed": "cd server && npm run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

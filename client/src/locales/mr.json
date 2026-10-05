@@ -1,0 +1,41 @@
+{
+  "appName": "LibraAI",
+  "appTagline": "एआय-सक्षम प्रगत ग्रंथालय प्रणाली",
+  "searchPlaceholder": "शीर्षक, लेखक, विषय, ISBN किंवा प्रश्न शोधा...",
+  "nav": {
+    "home": "मुख्यपृष्ठ",
+    "catalog": "कॅटलॉग",
+    "myShelf": "माझी पुस्तके",
+    "scanner": "स्कॅनर",
+    "seatBooking": "जागा बुकिंग",
+    "learningPath": "अभ्यास मार्ग",
+    "syllabusMatcher": "अभ्यासक्रम जुळवणी",
+    "knowledgeGraph": "ज्ञान आलेख",
+    "dashboard": "डॅशबोर्ड",
+    "adminImport": "पुस्तके आयात करा",
+    "members": "सदस्य",
+    "login": "लॉग इन",
+    "logout": "लॉग आउट"
+  },
+  "roles": {
+    "STUDENT": "विद्यार्थी",
+    "FACULTY": "प्राध्यापक",
+    "LIBRARIAN": "ग्रंथपाल",
+    "ADMIN": "प्रशासक"
+  },
+  "badges": {
+    "available": "उपलब्ध",
+    "issued": "सर्व वितरित",
+    "reserved": "राखीव"
+  },
+  "actions": {
+    "issue": "पुस्तक द्या",
+    "return": "पुस्तक परत घ्या",
+    "renew": "नूतनीकरण",
+    "reserve": "प्रतीक्षा यादी",
+    "askTheBook": "पुस्तकाशी संवाद",
+    "filter": "फिल्टर",
+    "clearAll": "सर्व साफ करा",
+    "viewDetails": "तपशील पहा"
+  }
+}

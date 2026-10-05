@@ -1,0 +1,41 @@
+{
+  "appName": "LibraAI",
+  "appTagline": "Next-Gen AI Library System",
+  "searchPlaceholder": "Search by title, author, topic, ISBN, or ask a question...",
+  "nav": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "myShelf": "My Shelf",
+    "scanner": "Scanner",
+    "seatBooking": "Seat Booking",
+    "learningPath": "Learning Path",
+    "syllabusMatcher": "Syllabus Matcher",
+    "knowledgeGraph": "Knowledge Graph",
+    "dashboard": "Dashboard",
+    "adminImport": "Import Books",
+    "members": "Members",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "roles": {
+    "STUDENT": "Student",
+    "FACULTY": "Faculty",
+    "LIBRARIAN": "Librarian",
+    "ADMIN": "Administrator"
+  },
+  "badges": {
+    "available": "Available",
+    "issued": "All Issued",
+    "reserved": "Reserved"
+  },
+  "actions": {
+    "issue": "Issue Book",
+    "return": "Return Book",
+    "renew": "Renew",
+    "reserve": "Join Waitlist",
+    "askTheBook": "Ask the Book",
+    "filter": "Filter",
+    "clearAll": "Clear All",
+    "viewDetails": "View Details"
+  }
+}
