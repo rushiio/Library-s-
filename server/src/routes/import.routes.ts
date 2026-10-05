@@ -7,10 +7,16 @@ import { ExcelImportService, ColumnMapping } from '../services/excelImportServic
 
 const router = Router();
 
+import os from 'os';
+
 // Configure multer file upload
-const uploadDir = path.resolve(process.cwd(), '../data/uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+const uploadDir = path.resolve(os.tmpdir(), 'libra_uploads');
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (e) {
+  // Silent fallback for restricted environments
 }
 
 const storage = multer.diskStorage({
